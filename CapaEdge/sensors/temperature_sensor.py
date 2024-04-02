@@ -6,8 +6,9 @@ from pathlib import Path
 from sender import enviarMensaje
 
 class SensorTemperatura(threading.Thread):
-    def __init__(self, config):
+    def __init__(self, config, nombre):
         threading.Thread.__init__(self)
+        self.nombre = nombre
         self.probaAcierto = config["acierto"]
         self.probaFuera = config["fuera"]
         self.probaError = config["error"]
@@ -15,7 +16,7 @@ class SensorTemperatura(threading.Thread):
     def run(self):
         while True:
             resultado = self.generar_lectura()
-            enviarMensaje(resultado, "Temperatura")
+            enviarMensaje(resultado, self.nombre)
             time.sleep(6)  # Espera 6 segundos entre lecturas
 
     def generar_lectura(self):
@@ -35,6 +36,7 @@ if __name__ == "__main__":
     with open(config_path, "r") as file:
         config = json.load(file)["temperatura"]
     
-    # Inicia el sensor de temperatura
-    sensor = SensorTemperatura(config)
-    sensor.start()
+    # Crear y ejecutar 10 instancias del sensor de humedad
+    for i in range(1, 11):
+        sensor = SensorTemperatura(config, f"Temperatura{i}")
+        sensor.start()
