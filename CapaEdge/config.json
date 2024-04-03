@@ -1,5 +1,0 @@
-{
-    "temperatura": {"acierto": 0.6, "fuera": 0.3, "error": 0.1},
-    "humedad": {"acierto": 0.7, "fuera": 0.2, "error": 0.1},
-    "humo": {"acierto": 0.8, "fuera": 0.0, "error": 0.2}
-}

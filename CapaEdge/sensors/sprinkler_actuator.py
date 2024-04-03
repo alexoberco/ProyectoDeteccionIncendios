@@ -13,10 +13,12 @@ class ActuadorAspersor(threading.Thread):
         print("Actuador aspersor esperando señales de humo...")
         while True:
             datos = self.socket.recv(1024).decode('utf-8')
-            # Divide el mensaje en sus partes componentes
-            partes_mensaje = datos.split(' - ')
-            sensorTipo_y_resultado, timestamp = partes_mensaje[0], partes_mensaje[1]
-            sensorTipo, resultado = sensorTipo_y_resultado.split(': ')
+            partes = datos.split(" - ")
+            info, timestamp = partes[0], partes[1]
+            sensorTipo, lote_str, resultado_str = info.split(":")
+            lote = int(lote_str.strip())
+            sensorTipo = sensorTipo.strip()
+            resultado = resultado_str.strip()
             if resultado == "True":
                 print(f"Alerta de humo detectada en sensor {sensorTipo}: Activando aspersor...")
         

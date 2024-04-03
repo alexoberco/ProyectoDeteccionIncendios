@@ -5,56 +5,96 @@ def iniciar_receptor_fog():
     socket = context.socket(zmq.PULL)
     socket.bind("tcp://*:5555")
 
-    # Diccionarios para acumular lecturas y contarlas
-    lecturas_humedad = []
-    lecturas_temperatura = []
-    detecciones_humo = []
+    # Listas para almacenar los datos de cada tipo de sensor
+    datos_humedad = []
+    datos_temperatura = []
+    datos_humo = []
 
-    conteo_humedad = 0
-    conteo_temperatura = 0
-    conteo_humo = 0
+    lote_temp = 1
+    lote_humo = 1
+    lote_hume = 1
+    cont_temp = 0
+    cont_humo =0
+    cont_hume = 0
 
     print("Receptor Fog iniciado y esperando mensajes...")
     while True:
         try:
-            datos = socket.recv_string()
-            # Divide el mensaje en sus partes componentes
-            partes_mensaje = datos.split(' - ')
-            sensorTipo_y_resultado, timestamp = partes_mensaje[0], partes_mensaje[1]
-            sensorTipo, resultado_str = sensorTipo_y_resultado.split(': ')
-            resultado = 1 if resultado_str == "True" else 0 if resultado_str == "False" else float(resultado_str)
-            print(f"{sensorTipo} con {resultado_str} TIEMPO {timestamp}")
-            # Clasifica las lecturas por tipo de sensor y las acumula
-            if "Humedad" in sensorTipo and resultado_str != "-1":
-                lecturas_humedad.append(resultado)
-                conteo_humedad += 1
-            elif "Temperatura" in sensorTipo and resultado_str != "-1":
-                lecturas_temperatura.append(resultado)
-                conteo_temperatura += 1
-            elif "Humo" in sensorTipo:
-                if resultado_str != "-1":  # Solo cuenta las detecciones de humo (True/False), ignora -1
-                    detecciones_humo.append(resultado)
-                conteo_humo += 1
+            datos = socket.recv(1024).decode('utf-8')
+            partes = datos.split(" - ")
+            info, timestamp = partes[0], partes[1]
+            sensorTipo, lote_str, resultado_str = info.split(":")
+            lote = int(lote_str.strip())
+            sensorTipo = sensorTipo.strip()
+            resultado = resultado_str.strip()
 
-            # Verifica si se han recibido 100 lecturas (10 por cada uno de los 10 sensores)
-            if conteo_humedad == 10:
-                promedio_humedad = sum(lecturas_humedad) / len(lecturas_humedad)
-                print(f"Promedio de Humedad: {promedio_humedad:.2f}")
-                lecturas_humedad.clear()
-                conteo_humedad = 0
+            if "Humo" in sensorTipo:
+                #print(f"{lote_humo} vs {lote}")
+                if lote_humo == lote:
+                    datos_humo.append({'sensor':sensorTipo, 'lote': lote, 'resultado': resultado})
+                    cont_humo += 1
+                    if cont_humo > 9:
+                        resultados = 0
+                        for dato in datos_humo:
+                            if dato['resultado'] == 'True':
+                                resultados += 1
+                        print(f"HUMO detectado en el lote {lote} en {resultados} sensores de 10\n")
+                else:
+                    datos_humo = []
+                    cont_humo = 0
+                    if lote_humo == 20:
+                        lote_humo = 1
+                    else:
+                        lote_humo = lote
+                    datos_humo.append({'sensor':sensorTipo, 'lote': lote, 'resultado': resultado})
+                    cont_humo += 1
+            elif "Humedad" in sensorTipo:
+                if lote_hume == lote:
+                    datos_humedad.append({'sensor':sensorTipo, 'lote': lote, 'resultado': resultado})
+                    cont_hume += 1
+                    if cont_hume > 9:
+                        x = 1
+                        resultados = 0
+                        for dato in datos_humedad:
+                            if dato['resultado'] != "-1":
+                                resultados += float(dato['resultado'])
+                                x += 1
+                        promedio_hume = resultados / x
+                        print(f"HUMEDAD promedio del lote {lote} es: {promedio_hume}\n")
+                else:
+                    datos_humedad = []
+                    cont_hume = 0
+                    if lote_hume == 20:
+                        lote_hume = 1
+                    else:
+                        lote_hume = lote
+                    datos_humedad.append({'sensor':sensorTipo, 'lote': lote, 'resultado': resultado})
+                    cont_hume += 1
+            elif "Temperatura" in sensorTipo:
+                if lote_temp == lote:
+                    datos_temperatura.append({'sensor':sensorTipo, 'lote': lote, 'resultado': resultado})
+                    cont_temp += 1
+                    if cont_temp > 9:
+                        x = 1
+                        resultados = 0
+                        for dato in datos_temperatura:
+                            if dato['resultado'] != "-1":
+                                resultados += float(dato['resultado'])
+                                x += 1
+                        promedio_temp = resultados / x
+                        print(f"TEMPERATURA promedio del lote {lote} es: {promedio_temp}\n")
+                else:
+                    datos_temperatura = []
+                    cont_temp = 0
+                    if lote_temp == 20:
+                        lote_temp = 1
+                    else:
+                        lote_temp = lote
+                    datos_temperatura.append({'sensor':sensorTipo, 'lote': lote, 'resultado': resultado})
+                    cont_temp += 1
 
-            if conteo_temperatura == 10:
-                promedio_temperatura = sum(lecturas_temperatura) / len(lecturas_temperatura)
-                print(f"Promedio de Temperatura: {promedio_temperatura:.2f}")
-                lecturas_temperatura.clear()
-                conteo_temperatura = 0
 
-            if conteo_humo == 10:  # Considera las lecturas de True/False, no promedio sino conteo de True
-                veces_detectado_humo = sum(detecciones_humo)
-                print(f"Humo detectado {veces_detectado_humo} veces de 10.")
-                detecciones_humo.clear()
-                conteo_humo = 0
-            
+
         except zmq.ZMQError as e:
             print(f"Ha ocurrido un error en la recepción de mensajes: {e}")
             break

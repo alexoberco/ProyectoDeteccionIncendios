@@ -1,4 +1,3 @@
-# smoke_sensor.py
 import threading
 import time
 import random
@@ -12,26 +11,35 @@ class SensorHumo(threading.Thread):
         self.nombre = nombre
         self.probaAcierto = config["acierto"]
         self.probaError = config["error"]
-        self.actuador_aspersor_port = "5566"  
+        self.actuador_aspersor_port = "5566"
+        self.lote_actual = 1  # Iniciar el contador de lote en 1
 
     def run(self):
         while True:
             resultado = self.generar_lectura()
-            enviarMensaje(resultado, self.nombre)
+            # Incluir el identificador de lote en el mensaje
+            enviarMensaje(self.lote_actual, resultado, self.nombre)
             if resultado:
-                enviarMensaje(resultado, self.nombre, self.actuador_aspersor_port)
+                enviarMensaje(self.lote_actual, resultado, self.nombre, self.actuador_aspersor_port)
+            
+            self.lote_actual += 1
+            if self.lote_actual % 20 == 1:
+                self.lote_actual = 1
+
             time.sleep(3)  # Intervalo entre lecturas para humo
 
     def generar_lectura(self):
         proba = random.uniform(0.0, 1.0)
         if proba < self.probaAcierto:
+            # Devolver True o False basado en una probabilidad
             return bool(random.getrandbits(1))
         else:
+            # Devolver -1 para indicar una lectura inválida o errónea
             return -1
 
 if __name__ == "__main__":
     current_directory = Path(__file__).parent
-    config_path = current_directory.parent / "config.json"
+    config_path = current_directory.parent / "configs/config_smoke.json"
 
     with open(config_path, "r") as file:
         config = json.load(file)["humo"]
@@ -40,5 +48,3 @@ if __name__ == "__main__":
     for i in range(1, 11):
         sensor = SensorHumo(config, f"Humo{i}")
         sensor.start()
-
-

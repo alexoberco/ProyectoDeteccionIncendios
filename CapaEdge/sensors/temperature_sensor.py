@@ -12,11 +12,15 @@ class SensorTemperatura(threading.Thread):
         self.probaAcierto = config["acierto"]
         self.probaFuera = config["fuera"]
         self.probaError = config["error"]
+        self.lote_actual = 1  # Iniciar el contador de lote en 1
 
     def run(self):
         while True:
             resultado = self.generar_lectura()
-            enviarMensaje(resultado, self.nombre)
+            enviarMensaje(self.lote_actual, resultado, self.nombre)
+            self.lote_actual += 1
+            if self.lote_actual % 20 == 1:
+                self.lote_actual = 1
             time.sleep(6)  # Espera 6 segundos entre lecturas
 
     def generar_lectura(self):
@@ -31,7 +35,7 @@ class SensorTemperatura(threading.Thread):
 if __name__ == "__main__":
     # Carga la configuración desde config.json
     current_directory = Path(__file__).parent
-    config_path = current_directory.parent / "config.json"
+    config_path = current_directory.parent / "configs/config_temperature.json"
 
     with open(config_path, "r") as file:
         config = json.load(file)["temperatura"]
