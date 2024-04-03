@@ -19,7 +19,6 @@ class ActuadorAspersor(threading.Thread):
             sensorTipo, resultado = sensorTipo_y_resultado.split(': ')
             if resultado == "True":
                 print(f"Alerta de humo detectada en sensor {sensorTipo}: Activando aspersor...")
-                enviarMensaje(f"ALERTA Actuador Aspersor activado por {sensorTipo}", "ActuadorAspersor")
         
 
 if __name__ == "__main__":
