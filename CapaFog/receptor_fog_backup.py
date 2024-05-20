@@ -1,13 +1,13 @@
 import zmq
 import threading
 
-def iniciar_receptor_fog():
+def iniciar_receptor_fog_backup():
     context = zmq.Context()
     socket = context.socket(zmq.PULL)
-    socket.bind("tcp://*:5555")
+    socket.bind("tcp://*:5555")  
 
     health_socket = context.socket(zmq.REP)
-    health_socket.bind("tcp://*:5559")  # Port for health check requests
+    health_socket.bind("tcp://*:5559")  #puerto para el health check111
 
     datos_humedad = []
     datos_temperatura = []
@@ -33,7 +33,7 @@ def iniciar_receptor_fog():
     health_thread = threading.Thread(target=handle_health_check)
     health_thread.start()
 
-    print("Receptor Fog iniciado y esperando mensajes...")
+    print("Receptor Fog Backup iniciado y esperando mensajes...")
     while True:
         try:
             datos = socket.recv(1024).decode('utf-8')
@@ -113,4 +113,4 @@ def iniciar_receptor_fog():
             break
 
 if __name__ == "__main__":
-    iniciar_receptor_fog()
+    iniciar_receptor_fog_backup()
