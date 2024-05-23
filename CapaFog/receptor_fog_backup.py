@@ -9,8 +9,6 @@ def iniciar_receptor_fog_backup():
     health_socket = context.socket(zmq.REP)
     health_socket.bind("tcp://*:5559")  #puerto para el health check111
 
-    sc_socket = context.socket(zmq.REQ)
-    sc_socket.bind("tcp://*:5571")#puerto para el sc
 
     datos_humedad = []
     datos_temperatura = []
@@ -109,8 +107,7 @@ def iniciar_receptor_fog_backup():
                         #enviar aleta de la temperatura 
                         if promedio_temp > 29.4:
                             alerta = f"Alerta de {sensorTipo} en Lote {lote}: {resultado}"
-                            sc_socket.send_string(alerta)
-                            sc_socket.recv_string()  # Esperar la confirmación del SC
+                            enviar_alerta_sc(alerta)
                         enviarMensaje(lote, promedio_temp, sensorTipo)
 
             
@@ -127,6 +124,13 @@ def iniciar_receptor_fog_backup():
         except zmq.ZMQError as e:
             print(f"Ha ocurrido un error en la recepción de mensajes: {e}")
             break
+
+def enviar_alerta_sc(alerta):
+        context = zmq.Context()
+        sc_socket = context.socket(zmq.REQ)
+        sc_socket.connect("tcp://localhost:5570")
+        sc_socket.send_string(alerta)
+        sc_socket.recv_string()
 
 if __name__ == "__main__":
     iniciar_receptor_fog_backup()

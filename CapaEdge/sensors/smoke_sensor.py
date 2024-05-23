@@ -2,6 +2,7 @@ import threading
 import time
 import random
 import json
+import zmq
 from pathlib import Path
 from sender import enviarMensaje
 
@@ -21,6 +22,7 @@ class SensorHumo(threading.Thread):
             enviarMensaje(self.lote_actual, resultado, self.nombre)
             if resultado:
                 enviarMensaje(self.lote_actual, resultado, self.nombre, self.actuador_aspersor_port)
+                self.enviar_alerta_sc(f"Humo detectado por {self.nombre}, Lote: {self.lote_actual}, Resultado: {resultado}")
             
             self.lote_actual += 1
             if self.lote_actual % 20 == 1:
@@ -36,6 +38,14 @@ class SensorHumo(threading.Thread):
         else:
             # Devolver -1 para indicar una lectura inválida o errónea
             return -1
+        
+    def enviar_alerta_sc(self, mensaje):
+        context = zmq.Context()
+        sc_socket = context.socket(zmq.REQ)
+        sc_socket.connect("tcp://localhost:5566")
+        sc_socket.send_string(mensaje)
+        sc_socket.recv_string()
+        
 
 if __name__ == "__main__":
     current_directory = Path(__file__).parent

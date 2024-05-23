@@ -16,6 +16,6 @@ def iniciar_sistema_calidad(puerto):
             break
 
 if __name__ == "__main__":
-    puertos = ["5570"]  # Puertos para cada capa
+    puertos = ["5566"]  # Puertos para capa Cloud
     for puerto in puertos:
         iniciar_sistema_calidad(puerto)

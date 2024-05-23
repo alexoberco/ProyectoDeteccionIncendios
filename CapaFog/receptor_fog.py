@@ -1,6 +1,7 @@
 import zmq
 import threading
 from sender import enviarMensaje
+from sender import enviarCorreo
 
 def iniciar_receptor_fog():
     context = zmq.Context()
@@ -9,9 +10,6 @@ def iniciar_receptor_fog():
 
     health_socket = context.socket(zmq.REP)
     health_socket.bind("tcp://*:5559")  # Port for health check requests
-
-    sc_socket = context.socket(zmq.REQ)
-    sc_socket.bind("tcp://*:5571")#puerto para el sc
 
     datos_humedad = []
     datos_temperatura = []
@@ -109,10 +107,12 @@ def iniciar_receptor_fog():
                         print(f"TEMPERATURA promedio del lote {lote} es: {promedio_temp}\n")
 
                         #enviar aleta de la temperatura 
-                        if promedio_temp > 29.4:
+                        if promedio_temp < 29.4:
                             alerta = f"Alerta de {sensorTipo} en Lote {lote}: {resultado}"
-                            sc_socket.send_string(alerta)
-                            sc_socket.recv_string()  # Esperar la confirmación del SC
+                            enviar_alerta_sc(alerta)
+                            mensaje = f"Correo:{lote}:{promedio_temp}:{sensorTipo}\n"
+                            enviarCorreo(lote, promedio_temp, sensorTipo)
+                            
                         enviarMensaje(lote, promedio_temp, sensorTipo)
 
             
@@ -130,5 +130,12 @@ def iniciar_receptor_fog():
             print(f"Ha ocurrido un error en la recepción de mensajes: {e}")
             break
 
+def enviar_alerta_sc(alerta):
+        context = zmq.Context()
+        sc_socket = context.socket(zmq.REQ)
+        sc_socket.connect("tcp://localhost:5570")
+        sc_socket.send_string(alerta)
+        sc_socket.recv_string()
+        
 if __name__ == "__main__":
     iniciar_receptor_fog()

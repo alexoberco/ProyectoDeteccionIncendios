@@ -47,4 +47,11 @@
 {"sensorTipo": "Humedad6", "lote": 11, "resultado": "73.38047277391786", "timestamp": "2024-05-23 12:54:35.248172\n"}
 {"sensorTipo": "Humedad", "lote": 2, "resultado": "71.56530214220832", "timestamp": "2024-05-23 12:59:21.382475\n"}
 {"sensorTipo": "Humedad", "lote": 3, "resultado": "75.04232334770899", "timestamp": "2024-05-23 12:59:26.358049\n"}
-{"sensorTipo": "Humedad", "lote": 4, "resultado": "60.842233263332204", "timestamp": "2024-05-23 12:59:31.380100\n"}
+{"sensorTipo": "Humedad", "lote": 4, "resultado": "60.842233263332204", "timestamp": "2024-05-23 12:59:31.380100\n"}{"sensorTipo": "Alerta en Temperatura", "lote": 7, "resultado": "19.012076721948706", "timestamp": "2024-05-23 17:22:08.869294\n"}
+{"sensorTipo": "Temperatura", "lote": 7, "resultado": "19.012076721948706", "timestamp": "2024-05-23 17:22:08.871323\n"}
+{"sensorTipo": "Temperatura", "lote": 11, "resultado": "20.891884068115576", "timestamp": "2024-05-23 17:35:37.837354\n"}
+{"sensorTipo": "Temperatura", "lote": 12, "resultado": "18.027950207221668", "timestamp": "2024-05-23 17:35:43.841296\n"}
+{"sensorTipo": "Temperatura", "lote": 13, "resultado": "21.344168088438135", "timestamp": "2024-05-23 17:35:49.841447\n"}
+{"sensorTipo": "Temperatura", "lote": 14, "resultado": "17.909141786114645", "timestamp": "2024-05-23 17:35:55.844713\n"}
+{"sensorTipo": "Temperatura", "lote": 15, "resultado": "17.390486234880026", "timestamp": "2024-05-23 17:36:01.859698\n"}
+{"sensorTipo": "Temperatura", "lote": 16, "resultado": "18.31596661222987", "timestamp": "2024-05-23 17:36:07.857435\n"}
