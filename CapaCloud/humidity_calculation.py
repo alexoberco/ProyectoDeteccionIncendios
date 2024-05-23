@@ -23,6 +23,7 @@ def calcular_humedad_mensual():
                         alerta = f"Alerta de humedad mensual baja para {sensor}: {humedad_mensual}"
                         print(alerta)
                         enviar_alerta_sc(alerta)
+                        
 
         except Exception as e:
             print(f"Error al calcular la humedad mensual: {e}")
@@ -30,7 +31,7 @@ def calcular_humedad_mensual():
 def enviar_alerta_sc(alerta):
     context = zmq.Context()
     sc_socket = context.socket(zmq.REQ)
-    sc_socket.connect("tcp://localhost:5572")
+    sc_socket.connect("tcp://localhost:5570")
     sc_socket.send_string(alerta)
     sc_socket.recv_string()  # Esperar la confirmación del SC
 
