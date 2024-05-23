@@ -82,7 +82,7 @@ def iniciar_receptor_fog():
                                 x += 1
                         promedio_hume = resultados / x
                         print(f"HUMEDAD promedio del lote {lote} es: {promedio_hume}\n")
-                        enviarMensaje(lote, promedio_hume, sensorTipo)
+                        #enviarMensaje(lote, promedio_hume, sensorTipo)
                 else:
                     datos_humedad = []
                     cont_hume = 0
@@ -91,6 +91,7 @@ def iniciar_receptor_fog():
                     else:
                         lote_hume = lote
                     datos_humedad.append({'sensor': sensorTipo, 'lote': lote, 'resultado': resultado})
+                    enviarMensaje(lote, promedio_hume, sensorTipo)
                     cont_hume += 1
 
             elif "Temperatura" in sensorTipo:

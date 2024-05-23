@@ -1,6 +1,7 @@
 import zmq
 import json
 from datetime import datetime
+import re
 
 def almacenar_datos(sensorTipo, lote, resultado, timestamp):
     # Almacenar los datos en un archivo JSON o una base de datos
@@ -33,6 +34,8 @@ def iniciar_proxy_cloud():
             lote = int(lote_str.strip())
             sensorTipo = sensorTipo.strip()
             resultado = resultado_str.strip()
+
+            sensorTipo = re.sub(r'\d+$', '', sensorTipo)
             
             # Almacenar datos recibidos
             almacenar_datos(sensorTipo, lote, resultado, timestamp)
