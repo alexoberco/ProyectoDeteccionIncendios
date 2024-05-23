@@ -1,5 +1,6 @@
 import zmq
 import threading
+from sender import enviarMensaje
 
 def iniciar_receptor_fog():
     context = zmq.Context()
@@ -8,6 +9,9 @@ def iniciar_receptor_fog():
 
     health_socket = context.socket(zmq.REP)
     health_socket.bind("tcp://*:5559")  # Port for health check requests
+
+    sc_socket = context.socket(zmq.REQ)
+    sc_socket.bind("tcp://*:5571")#puerto para el sc
 
     datos_humedad = []
     datos_temperatura = []
@@ -54,6 +58,7 @@ def iniciar_receptor_fog():
                             if dato['resultado'] == 'True':
                                 resultados += 1
                         print(f"HUMO detectado en el lote {lote} en {resultados} sensores de 10\n")
+                        enviarMensaje(lote, resultado, sensorTipo)
                 else:
                     datos_humo = []
                     cont_humo = 0
@@ -63,6 +68,7 @@ def iniciar_receptor_fog():
                         lote_humo = lote
                     datos_humo.append({'sensor': sensorTipo, 'lote': lote, 'resultado': resultado})
                     cont_humo += 1
+
             elif "Humedad" in sensorTipo:
                 if lote_hume == lote:
                     datos_humedad.append({'sensor': sensorTipo, 'lote': lote, 'resultado': resultado})
@@ -76,6 +82,7 @@ def iniciar_receptor_fog():
                                 x += 1
                         promedio_hume = resultados / x
                         print(f"HUMEDAD promedio del lote {lote} es: {promedio_hume}\n")
+                        enviarMensaje(lote, promedio_hume, sensorTipo)
                 else:
                     datos_humedad = []
                     cont_hume = 0
@@ -85,6 +92,7 @@ def iniciar_receptor_fog():
                         lote_hume = lote
                     datos_humedad.append({'sensor': sensorTipo, 'lote': lote, 'resultado': resultado})
                     cont_hume += 1
+
             elif "Temperatura" in sensorTipo:
                 if lote_temp == lote:
                     datos_temperatura.append({'sensor': sensorTipo, 'lote': lote, 'resultado': resultado})
@@ -98,6 +106,15 @@ def iniciar_receptor_fog():
                                 x += 1
                         promedio_temp = resultados / x
                         print(f"TEMPERATURA promedio del lote {lote} es: {promedio_temp}\n")
+
+                        #enviar aleta de la temperatura 
+                        if promedio_temp > 29.4:
+                            alerta = f"Alerta de {sensorTipo} en Lote {lote}: {resultado}"
+                            sc_socket.send_string(alerta)
+                            sc_socket.recv_string()  # Esperar la confirmación del SC
+                        enviarMensaje(lote, promedio_temp, sensorTipo)
+
+            
                 else:
                     datos_temperatura = []
                     cont_temp = 0
