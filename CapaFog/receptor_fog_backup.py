@@ -1,5 +1,7 @@
 import zmq
 import threading
+from sender import enviarMensaje
+from sender import enviarCorreo
 
 def iniciar_receptor_fog_backup():
     context = zmq.Context()
@@ -108,6 +110,8 @@ def iniciar_receptor_fog_backup():
                         if promedio_temp > 29.4:
                             alerta = f"Alerta de {sensorTipo} en Lote {lote}: {resultado}"
                             enviar_alerta_sc(alerta)
+                            enviarCorreo(lote, promedio_temp, sensorTipo)
+                            
                         enviarMensaje(lote, promedio_temp, sensorTipo)
 
             

@@ -110,7 +110,6 @@ def iniciar_receptor_fog():
                         if promedio_temp < 29.4:
                             alerta = f"Alerta de {sensorTipo} en Lote {lote}: {resultado}"
                             enviar_alerta_sc(alerta)
-                            mensaje = f"Correo:{lote}:{promedio_temp}:{sensorTipo}\n"
                             enviarCorreo(lote, promedio_temp, sensorTipo)
                             
                         enviarMensaje(lote, promedio_temp, sensorTipo)
