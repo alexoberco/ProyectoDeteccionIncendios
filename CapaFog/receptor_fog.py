@@ -107,7 +107,7 @@ def iniciar_receptor_fog():
                         print(f"TEMPERATURA promedio del lote {lote} es: {promedio_temp}\n")
 
                         #enviar aleta de la temperatura 
-                        if promedio_temp < 29.4:
+                        if promedio_temp > 29.4:
                             alerta = f"Alerta de {sensorTipo} en Lote {lote}: {resultado}"
                             enviar_alerta_sc(alerta)
                             enviarCorreo(lote, promedio_temp, sensorTipo)
